@@ -4,6 +4,7 @@ This module contains PokeType, TypeEffectiveness and an abstract version of the 
 from abc import ABC
 from enum import Enum
 from data_structures.referential_array import ArrayR
+import csv
 
 class PokeType(Enum):
     """
@@ -42,7 +43,11 @@ class TypeEffectiveness:
         Returns:
             float: The effectiveness of the attack, as a float value between 0 and 4.
         """
-        raise NotImplementedError
+        with open('type_effectiveness.csv', mode='r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                print(row[0])
+
 
     def __len__(self) -> int:
         """
