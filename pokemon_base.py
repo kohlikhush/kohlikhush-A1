@@ -4,6 +4,7 @@ This module contains PokeType, TypeEffectiveness and an abstract version of the 
 from abc import ABC
 from enum import Enum
 from data_structures.referential_array import ArrayR
+import csv
 
 class PokeType(Enum):
     """
@@ -42,13 +43,28 @@ class TypeEffectiveness:
         Returns:
             float: The effectiveness of the attack, as a float value between 0 and 4.
         """
-        raise NotImplementedError
+        with open('type_effectiveness.csv', mode='r') as file:
+            reader = csv.reader(file)
+            header = next(reader)
+            h2 = [type.upper() for type in header]
+            index1 = h2.index(attack_type.name)
+            index2 = h2.index(defend_type.name)
+            for _ in range(index1):
+                next(reader)
+            row = next(reader)
+            eff = float(row[index2])
+        return eff
 
     def __len__(self) -> int:
         """
         Returns the number of types of Pokemon
         """
-        raise NotImplementedError
+        with open('type_effectiveness.csv', mode='r') as file:
+            reader = csv.reader(file)
+            header = next(reader)
+        return len(header)
+        
+
 
 
 class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -161,7 +177,11 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
         Returns:
             int: The damage that this Pokemon inflicts on the other Pokemon during an attack.
         """
-        raise NotImplementedError
+        ty1 = self.poketype
+        ty2 = Pokemon.get_poketype(other_pokemon)
+        eff = TypeEffectiveness.get_effectiveness(PokeType.ty1, PokeType.ty2)
+        bp = self.battle_power
+        return bp*eff
 
     def defend(self, damage: int) -> None:
         """
@@ -189,7 +209,14 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
         Evolves the Pokemon to the next stage in its evolution line, and updates
           its attributes accordingly.
         """
-        raise NotImplementedError
+        for name in self.evolution_line :
+            if self.name != name :
+                self.name = name
+            break
+        self.battle_power = self.battle_power*(1.5)
+        self.health = self.health*(1.5)
+        self.speed = self.speed*(1.5)
+        self.defence = self.defence*(1.5)
 
     def is_alive(self) -> bool:
         """
@@ -206,3 +233,4 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
         <name> (Level <level>) with <health> health and <experience> experience
         """
         return f"{self.name} (Level {self.level}) with {self.get_health()} health and {self.get_experience()} experience"
+
