@@ -2,27 +2,28 @@ from pokemon import *
 import random
 from typing import List
 from battle_mode import BattleMode
+from data_structures.referential_array import ArrayR
 from data_structures.abstract_list import List
 
-# class MyList(abstract_list.List):
-#     def __init__(self):
-#         super().__init__()
-#         self._data = []  # Initialize a list to store data
+class MyList(List):
+    def __init__(self):
+        super().__init__()
+        self._data = []  # Initialize a list to store data
     
-#     def __getitem__(self, index):
-#         return self._data[index]  # Implement __getitem__ method
+    def __getitem__(self, index):
+        return self._data[index]  # Implement __getitem__ method
     
-#     def __setitem__(self, index, value):
-#         self._data[index] = value  # Implement __setitem__ method
+    def __setitem__(self, index, value):
+        self._data[index] = value  # Implement __setitem__ method
     
-#     def delete_at_index(self, index):
-#         del self._data[index]  # Implement delete_at_index method
+    def delete_at_index(self, index):
+        del self._data[index]  # Implement delete_at_index method
     
-#     def index(self, item):
-#         return self._data.index(item)  # Implement index method
+    def index(self, item):
+        return self._data.index(item)  # Implement index method
     
-#     def insert(self, index, item):
-#         self._data.insert(index, item)  # Implement insert method
+    def insert(self, index, item):
+        self._data.insert(index, item)  # Implement insert method
 
 
 class PokeTeam:
@@ -31,7 +32,7 @@ class PokeTeam:
     CRITERION_LIST = ["health", "defence", "battle_power", "speed", "level"]
 
     def __init__(self):
-        self.team = List()
+        self.team = ArrayR(6)
         self.team_count = 0
 
     def choose_manually(self):
@@ -42,23 +43,23 @@ class PokeTeam:
             if not pokemon_type:
                 break
             if pokemon_type in self.POKE_LIST:
-                self.team.append(pokemon_type)
+                self.team.__setitem__(self.team_count, pokemon_type)
                 self.team_count += 1
             else:
                 print("Invalid Pokemon type. Please choose from the available types.")
 
     def choose_randomly(self) -> None:
         all_pokemon = get_all_pokemon_types()
-        self.team_count = 0
-        for _ in range(self.TEAM_LIMIT):
+        for i in range(PokeTeam.TEAM_LIMIT):
             rand_int = random.randint(0, len(all_pokemon)-1)
-            self.team.append(all_pokemon[rand_int])
+            self.team[i] = all_pokemon[rand_int]()
             self.team_count += 1
 
     def regenerate_team(self, battle_mode: BattleMode, criterion: str = None) -> None:
-        for pokemon_type in self.team:
-            # Code to regenerate Pokemon team based on battle mode and criterion
-            pass
+        for pokemon in self.team:
+            parent_class = pokemon.__class__()
+            max_hp = parent_class.health
+            pokemon.health = max_hp        
 
     def assign_team(self, criterion: str = None) -> None:
         pass
@@ -73,17 +74,20 @@ class PokeTeam:
         return self.team[index]
 
     def __len__(self):
-        return len(self.team)
+        return self.team_count
 
     def __str__(self):
-        return '\n'.join(str(pokemon) for pokemon in self.team)
+        return '\n'.join(str(pokemon) for pokemon in self.team if pokemon is not None)
+        
+        
+            
 
 class Trainer:
 
     def __init__(self, name) -> None:
         self.name = name
         self.poke_team = PokeTeam()
-        self.pokedex = List()
+        self.pokedex = MyList()
 
     def pick_team(self, method: str) -> None:
         if method == 'Random':
@@ -101,16 +105,11 @@ class Trainer:
 
     def register_pokemon(self, pokemon: Pokemon) -> None:
         pokemon_type = Pokemon.get_poketype(pokemon)
-        self.pokedex.append(pokemon_type)
+        self.pokedex.append(pokemon_type)  
     
     def get_pokedex_completion(self) -> float:
         total_types = len(PokeType)
-        seen_types = 0
-        for p_type in self.pokedex:
-            if p_type != PokeType.FIRE:
-                seen_types += 1
-        if PokeType.FIRE in self.pokedex:
-            seen_types += 1  # Increment if FIRE type is seen
+        seen_types = len(set(self.pokedex))
         return round(seen_types / total_types, 2)  # Calculate completion percentage
 
     def __str__(self) -> str:
@@ -123,3 +122,4 @@ if __name__ == '__main__':
     t.pick_team("Random")
     print(t)
     print(t.get_team())
+    
