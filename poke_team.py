@@ -52,7 +52,7 @@ class PokeTeam:
         all_pokemon = get_all_pokemon_types()
         for i in range(PokeTeam.TEAM_LIMIT):
             rand_int = random.randint(0, len(all_pokemon)-1)
-            self.team[i] = all_pokemon[rand_int]()
+            self.team.append(all_pokemon[rand_int])
             self.team_count += 1
 
     def regenerate_team(self, battle_mode: BattleMode, criterion: str = None) -> None: #  Best case: O(1) (when the team is empty), Worst case: O(TEAM_LIMIT) (when regenerating health for each Pokémon in the team)
