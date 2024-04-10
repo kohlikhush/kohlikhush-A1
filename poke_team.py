@@ -52,7 +52,7 @@ class PokeTeam:
         all_pokemon = get_all_pokemon_types()
         for i in range(PokeTeam.TEAM_LIMIT):
             rand_int = random.randint(0, len(all_pokemon)-1)
-            self.team[i] = all_pokemon[rand_int]()
+            self.team.append(all_pokemon[rand_int])
             self.team_count += 1
 
     def regenerate_team(self, battle_mode: BattleMode, criterion: str = None) -> None:
@@ -78,9 +78,7 @@ class PokeTeam:
 
     def __str__(self):
         return '\n'.join(str(pokemon) for pokemon in self.team if pokemon is not None)
-        
-        
-            
+
 
 class Trainer:
 
@@ -88,6 +86,7 @@ class Trainer:
         self.name = name
         self.poke_team = PokeTeam()
         self.pokedex = MyList()
+
 
     def pick_team(self, method: str) -> None:
         if method == 'Random':
@@ -110,6 +109,7 @@ class Trainer:
     def get_pokedex_completion(self) -> float:
         total_types = len(PokeType)
         seen_types = len(set(self.pokedex))
+
         return round(seen_types / total_types, 2)  # Calculate completion percentage
 
     def __str__(self) -> str:
